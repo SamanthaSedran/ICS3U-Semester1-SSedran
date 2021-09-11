@@ -66,7 +66,16 @@ public class DayTwoHomework {
         System.out.println("When the user has "+pennys+" penny(s), "+nickels+" nickel(s), "+dimes+" dime(s), "+quarters+" quarter(s), "+loonies+" loonie(s), and "+toonies+" toonie(s), the user has $"+amount);
 
     Q6 - Find the Roots of the Equation in Q3
+        int a = 3;
+        int b = 5;
+        int c = 2;
+        double x1;
+        double x2;
 
+        x1=(-b+Math.sqrt(b*b-4*a*c))/(2*a);
+        x2=(-b-Math.sqrt(b*b-4*a*c))/(2*a);
+
+        System.out.println("The two roots of the equation y="+a+"x^2+"+b+"x+"+c+" are "+x1+" and "+x2);
 
     Idea for isNaN Checker:
             if (x1.isNaN()==true) {
