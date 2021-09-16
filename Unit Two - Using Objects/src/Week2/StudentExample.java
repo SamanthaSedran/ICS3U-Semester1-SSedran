@@ -42,7 +42,7 @@ public class StudentExample {
         alan.addTest(67);
         alan.displayAverage();
 
-        //alan.numMarks = 7; don't have access to public ... more on github
+        //alan.numMarks = 7; don't have access to public ... more on github on
 
     }
 }

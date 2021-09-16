@@ -17,7 +17,7 @@ public class Student { //most classes do not have mains
     private int grade;
     private int totalMarks;
     private int numMarks;
-    private int average;
+    private double average;
 /**
  * The method with the same name as the class is used to instantiate(create) a student object (an object is an instance of a class)
  * constructor - same name as the class and its purpose is used to instantiate an instance of the class (create a state and places it in its... more on github)
