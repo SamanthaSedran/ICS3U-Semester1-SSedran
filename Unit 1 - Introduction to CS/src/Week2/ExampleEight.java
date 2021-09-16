@@ -1,4 +1,4 @@
-package Week1;
+package Week2;
 
 /**
  * Type Casting (Primitives)

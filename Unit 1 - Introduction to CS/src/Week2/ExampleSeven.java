@@ -1,4 +1,4 @@
-package Week1;
+package Week2;
 
 /**
  * Compound Assignment Operators
@@ -21,6 +21,10 @@ public class ExampleSeven {
         //Right now, at this point, x == 3
         int y = 2 * x++; //if the ++ comes after, we will increment x after we've used it
         int z = 2 * ++x; //if the ++ comes before, we will increment x and then use it
+
+        int a = 1;
+        double t = 1.5;
+        System.out.print(a+t);
 
     }
 }
