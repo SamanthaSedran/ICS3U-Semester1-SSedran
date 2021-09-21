@@ -35,6 +35,14 @@ public Student(String name, String studentNumber, int grade) {
     this.average = 0;
   }
 
+  public Student(String name, String studentNumber){
+    this.name = name;
+    this.studentNumber = studentNumber;
+    this.grade = 9;
+    this.totalMarks = 0;
+    this.numMarks = 0;
+    this.average = 0;
+  }
 
   /**
    * displayName, displayStudentNumber, increaseGrade, displayGrade
@@ -43,6 +51,14 @@ public Student(String name, String studentNumber, int grade) {
 
   public void displayName() {
     System.out.println(name);
+  }
+
+  public void displayName(String message){
+    System.out.println(message+" "+name);
+  }
+
+  public String getName(){
+    return name;
   }
   /**
    * A void method performs a task and does not return a value
@@ -54,6 +70,11 @@ public Student(String name, String studentNumber, int grade) {
   /*
   non-static methods do not have the word (modifier static before the return type (void))
   ...more on github
+  methods and attributes that are non-static belong to object, not the class. When attributes become static, 
+  they no longer belong to the object, they become shared and belong to the class.
+  You can call it through the class name.
+  Ex. 
+
   */
   public void increaseGrade() { //void methods perform a task, but do not return a value
     grade++;
@@ -68,6 +89,10 @@ public Student(String name, String studentNumber, int grade) {
     System.out.println(average);
   }
 
+  public double getAverage(){
+    return average;
+  }
+
   public void addTest(int mark){
     totalMarks += mark;
     numMarks++;
@@ -77,5 +102,7 @@ public Student(String name, String studentNumber, int grade) {
   private void calculateAverage() {
     average = (double)totalMarks/numMarks;
   }
+
+
 
 }

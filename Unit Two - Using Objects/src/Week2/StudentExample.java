@@ -41,8 +41,20 @@ public class StudentExample {
         alan.displayAverage();
         alan.addTest(67);
         alan.displayAverage();
+        double avg = alan.getAverage();
+        //double avg = alan.getAverage(); not used (called getAverage)...More on Github
+        System.out.println(alan.getName()+" has an average of "+alan.getAverage());
 
         //alan.numMarks = 7; don't have access to public ... more on github on
+
+        alan.displayName("Hello");
+        alan.displayName();
+
+        Student stefano = new Student("Stefano", "876273");
+            stefano.displayName();
+            stefano.displayGrade();
+        
+        
 
     }
 }
