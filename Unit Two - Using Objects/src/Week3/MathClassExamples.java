@@ -8,6 +8,9 @@ public class MathClassExamples {
         //this method was called through an object, and not a class
         System.out.println(Math.abs(a));
 
+        int e = 7;
+        System.out.print(Math.abs(e));
+
         //Square root
         System.out.println(Math.sqrt(10));
         

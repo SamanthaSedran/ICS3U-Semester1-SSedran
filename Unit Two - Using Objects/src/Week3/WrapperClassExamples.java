@@ -22,6 +22,5 @@ public class WrapperClassExamples {
 
        System.out.println(Integer.MAX_VALUE); //Static constants that represent the largest and smallest possible ints
        System.out.println(Integer.MIN_VALUE);
-
     }
 }
