@@ -26,6 +26,11 @@ public class CrazyEights {
         String c1Hand = "";
         String c2Hand = "";
 
+        boolean gameOver = false;
+        boolean roundDone = false;
+
+        String round = "";
+
         System.out.println("Welcome to Crazy Eights!");
         System.out.println();
 
@@ -35,70 +40,129 @@ public class CrazyEights {
             c2Hand = getCard() + " " + c2Hand;
         }
 
-        pHand = ifTen(pHand);
-        System.out.println("Your Hand: "+pHand);
-        pHand = reverseTen(pHand);
-        c1Hand = ifTen(c1Hand);
-        System.out.println("Computer Player 1's Hand: "+c1Hand);
-        c1Hand = reverseTen(c1Hand);
-        c2Hand = ifTen(c2Hand);
-        System.out.println("Computer Player 2's Hand: "+c2Hand);
-        c2Hand = reverseTen(c2Hand);
-        System.out.println();
-
         String firstCard = getCard();
         while(firstCard.substring(0,1).equals("8")){
             firstCard = getCard();
         }
 
-        firstCard = ifTen(firstCard);
-        System.out.println("The 1st card drawn from the stock pile is: "+firstCard);
-        firstCard = reverseTen(firstCard);
-        System.out.println();
-
         Scanner in = new Scanner(System.in);
 
-        String beforePlayerFirstCard = firstCard;
-         String p1breakdown = playerPlay(pHand, in, firstCard);
-         pHand = p1breakdown.substring(0, p1breakdown.indexOf("-"));
-         firstCard = p1breakdown.substring(p1breakdown.indexOf("-")+1);
-        
-         if(!beforePlayerFirstCard.equals(firstCard)){
-         firstCard = ifTen(firstCard);
-         System.out.println("You play "+firstCard);
-         firstCard = reverseTen(firstCard);
-         firstCard = playerEight(firstCard, in);
-         
+        while(!gameOver){
+           roundDone = false;
+           while(!roundDone){
+            round = round(pHand, c1Hand, c2Hand, firstCard, in);
+            pHand = round.substring(0, round.indexOf("-"));
+            c1Hand = round.substring(round.indexOf("-")+1, round.indexOf("*"));
+            c2Hand = round.substring(round.indexOf("*")+1, round.indexOf("_"));
+            firstCard = round.substring(round.indexOf("_"+1));
+            roundDone = roundOver(pHand, c1Hand, c2Hand);
+            }
+            pPoints = getPoints(pHand);
+            c1Points = getPoints(c1Hand);
+            c2Points = getPoints(c2Hand);
+            System.out.print("Player has "+pPoints+"points");
+            System.out.print("Computer player 1 has "+c1Points+"points");
+            System.out.print("Computer player 2 has "+c2Points+"points");
+            gameOver = gameDone(pPoints, c1Points, c2Points);
          }
-
-         pHand = ifTen(pHand);
-         System.out.println("Your Hand: "+pHand);
-         pHand = reverseTen(pHand);
-         System.out.println();
-         
-         String c1Breakdown = computerPlay(c1Hand, firstCard, 1);
-         c1Hand = c1Breakdown.substring(0, c1Breakdown.indexOf("-"));
-         firstCard = c1Breakdown.substring(c1Breakdown.indexOf("-")+1);
-
-         c1Hand = ifTen(c1Hand);
-         System.out.println("Computer Player 1's Hand: "+c1Hand);
-         c1Hand = reverseTen(c1Hand);
-         System.out.println();
-
-         String c2Breakdown = computerPlay(c2Hand, firstCard, 2);
-         c2Hand = c2Breakdown.substring(0, c2Breakdown.indexOf("-"));
-         firstCard = c2Breakdown.substring(c2Breakdown.indexOf("-")+1);
-
-         c2Hand = ifTen(c2Hand);
-         System.out.println("Computer Player 2's Hand: "+c2Hand);
-         c2Hand = reverseTen(c2Hand);
-         System.out.println();
-
-         System.out.println("Round Over");
-  
+         winner(pPoints, c1Points, c2Points);
     }
 
-    private static String playerEight(String card, Scanner in) {
+
+    private static void winner(int pPoints, int c1Points, int c2Points) {
+      System.out.print("Player has "+pPoints+"points");
+      System.out.print("Computer player 1 has "+c1Points+"points");
+      System.out.print("Computer player 2 has "+c2Points+"points");
+      if(!(pPoints==100)&& pPoints<c1Points && pPoints<c2Points){
+         System.out.print("You won!!!!");
+      }else if(!(c1Points==100)&& c1Points<pPoints && c1Points<c2Points){
+         System.out.print("Computer Player 1 won!!!!");
+      }else if(!(c2Points==100)&& c2Points<pPoints && c2Points<c1Points){
+         System.out.print("Computer Player 2 won!!!!");
+      }else if((pPoints==c1Points && pPoints<100) || (c1Points==c2Points && c1Points<100) || (pPoints==c2Points && pPoints<100)){
+         System.out.print("Tie!!");
+      }
+   }
+
+
+   private static boolean gameDone(int pPoints, int c1Points, int c2Points) {
+       if(pPoints==100 || c1Points==100 || c2Points==100){
+         return true;
+       }else{
+          return false;
+       }
+   }
+
+
+   private static int getPoints(String hand) {
+      int totalPoints = 0;
+      for(int i = 0; i<hand.length(); i+=3){
+         if(hand.substring(i, i+1).equals("8")){
+            totalPoints += 50;
+         }else if(Integer.parseInt(hand.substring(i, i+1))>1 && Integer.parseInt(hand.substring(i, i+1))<10){
+            totalPoints += Integer.parseInt(hand.substring(i, i+1));
+         }else if(hand.substring(i, i+1).equals("A")){
+            totalPoints += 1;
+         }else if(hand.substring(i, i+1).equals("T")||hand.substring(i, i+1).equals("J")||hand.substring(i, i+1).equals("Q")||hand.substring(i, i+1).equals("K")){
+            totalPoints += 10;
+         }         
+       }
+      return totalPoints;
+   }
+
+
+   private static boolean roundOver(String pHand, String c1Hand, String c2Hand) {
+       if((pHand=="")||(c1Hand=="")||(c2Hand=="")){
+          return true;
+       }else{
+          return false;
+       }
+   }
+
+
+   private static String round(String pHand, String c1Hand, String c2Hand, String firstCard, Scanner in) {
+      System.out.println("Your Hand: "+ifTen(pHand));
+      System.out.println("Computer Player 1's Hand: "+ifTen(c1Hand));
+      System.out.println("Computer Player 2's Hand: "+ifTen(c2Hand));
+      System.out.println();
+
+      System.out.println("The 1st card drawn from the stock pile is: "+ifTen(firstCard));
+      System.out.println();
+
+      String beforePlayerFirstCard = firstCard;
+       String p1breakdown = playerPlay(pHand, in, firstCard);
+       pHand = p1breakdown.substring(0, p1breakdown.indexOf("-"));
+       firstCard = p1breakdown.substring(p1breakdown.indexOf("-")+1);
+      
+       if(!beforePlayerFirstCard.equals(firstCard)){
+       System.out.println("You play "+ifTen(firstCard));
+       firstCard = playerEight(firstCard, in);
+       
+       }
+
+       System.out.println("Your Hand: "+ifTen(pHand));
+       System.out.println();
+       
+       String c1Breakdown = computerPlay(c1Hand, firstCard, 1);
+       c1Hand = c1Breakdown.substring(0, c1Breakdown.indexOf("-"));
+       firstCard = c1Breakdown.substring(c1Breakdown.indexOf("-")+1);
+
+       System.out.println("Computer Player 1's Hand: "+ifTen(c1Hand));
+       System.out.println();
+
+       String c2Breakdown = computerPlay(c2Hand, firstCard, 2);
+       c2Hand = c2Breakdown.substring(0, c2Breakdown.indexOf("-"));
+       firstCard = c2Breakdown.substring(c2Breakdown.indexOf("-")+1);
+
+       System.out.println("Computer Player 2's Hand: "+ifTen(c2Hand));
+       System.out.println();
+
+       System.out.println("Round Over");
+       return pHand +"-"+ c1Hand +"*"+ c2Hand +"_"+ firstCard;
+   }
+
+
+   private static String playerEight(String card, Scanner in) {
       if(card.substring(0,1).equals("8")){
          boolean validInput = false;
          while (!validInput) {
@@ -130,7 +194,7 @@ public class CrazyEights {
             if(c1numPickedUp<5){
                c1numPickedUp++;
                String compickup = getCard();
-               System.out.println("Computer cannot play with the cards it has. So it picks up: "+compickup);
+               System.out.println("Computer cannot play with the cards it has. So it picks up: "+ifTen(compickup));
                hand += compickup + " ";
                card = computerMove(hand, firstCard);
                if(card.indexOf("-drawagain")>=0){
@@ -149,10 +213,12 @@ public class CrazyEights {
       firstCard = card;
       if(hand.indexOf(card)==0){
          hand = hand.substring(hand.indexOf(card)+card.length()+1);
+      }else if(hand.indexOf(card)==hand.length()-card.length()-1){
+         hand = hand.substring(0, hand.indexOf(card));
       }else{
          hand = hand.substring(0, hand.indexOf(card)-1)+hand.substring(hand.indexOf(card)+card.length());
       }
-      System.out.println("Computer "+cNum+" plays: "+firstCard);
+      System.out.println("Computer "+cNum+" plays: "+ifTen(firstCard));
       return hand+"-"+firstCard;
    }
 
@@ -202,7 +268,7 @@ public class CrazyEights {
       }else{
           if(numPickedUp<5){
              String drawCard = getCard();
-             System.out.println("You cannot play with the cards you have. You draw: "+drawCard);
+             System.out.println("You cannot play with the cards you have. You draw: "+ifTen(drawCard));
             pHand = pHand + drawCard + " ";
             numPickedUp++;
           }else{
@@ -268,7 +334,7 @@ public class CrazyEights {
       boolean play = false;
       String answer = "";
       while(!play){
-      System.out.println("Your hand: "+hand);
+      System.out.println("Your hand: "+ifTen(hand));
       System.out.print("Please enter a card to play: ");
       answer = in.nextLine().toUpperCase();
       answer = reverseTen(answer);
@@ -302,14 +368,15 @@ public class CrazyEights {
   
      private static String getSuit() {
         int suit = (int) (Math.random() * 4);
-        if (suit == 0)
+        if (suit == 0){
            return HEARTS;
-        else if (suit == 1)
+        }else if (suit == 1){
            return SPADES;
-        else if (suit == 2)
+        }else if (suit == 2){
            return CLUBS;
-        else
+        }else{
            return DIAMONDS;
+        }
      }
   
      private static String getFace() {
@@ -328,16 +395,4 @@ public class CrazyEights {
            return KING;
         }
      }
-
-      /* if(card.substring(0,1).equals("A")){
-         card = "1"+card.substring(1,2);
-     }else if(card.substring(0,1).equals("J")){
-         card = "11"+card.substring(1,2);
-     }else if(card.substring(0,1).equals("Q")){
-         card = "12"+card.substring(1,2);
-     }else if(card.substring(0,1).equals("K")){
-         card = "13"+card.substring(1,2);
-     }else{
-        card = "0"+card;
-     }*/
 }
