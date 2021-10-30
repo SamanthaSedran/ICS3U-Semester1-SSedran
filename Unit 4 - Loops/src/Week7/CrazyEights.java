@@ -14,6 +14,7 @@ public class CrazyEights {
     private static final String QUEEN = "Q";
     private static final String JACK = "J";
     private static final String WILD = "W";
+    private static final String TEN = "T";
 
     private static final int MAX_CARDS = 5;
 
@@ -33,126 +34,166 @@ public class CrazyEights {
             c1Hand = getCard() + " " + c1Hand;
             c2Hand = getCard() + " " + c2Hand;
         }
-        System.out.println("Your Hand: "+pHand);
-        System.out.println("Computer Player 1's Hand: "+c1Hand);
-        System.out.println("Computer Player 2's Hand: "+pHand);
 
-        // playerHand => "7H AD KC"
+        pHand = ifTen(pHand);
+        System.out.println("Your Hand: "+pHand);
+        pHand = reverseTen(pHand);
+        c1Hand = ifTen(c1Hand);
+        System.out.println("Computer Player 1's Hand: "+c1Hand);
+        c1Hand = reverseTen(c1Hand);
+        c2Hand = ifTen(c2Hand);
+        System.out.println("Computer Player 2's Hand: "+c2Hand);
+        c2Hand = reverseTen(c2Hand);
 
         String firstCard = getCard();
         while(firstCard.substring(0,1).equals("8")){
             firstCard = getCard();
         }
 
+        firstCard = ifTen(firstCard);
         System.out.println("The 1st card drawn from the stock pile is: "+firstCard);
+        firstCard = reverseTen(firstCard);
 
         Scanner in = new Scanner(System.in);
 
-        boolean play = false;
-        int numPickedUp = 0;
-        while(!play){
-        if(canPlay(pHand, firstCard)){
-            String playerCard = playerMove(in, pHand, firstCard);
-            pHand = pHand.substring(0,pHand.indexOf(playerCard)) + pHand.substring(pHand.indexOf(playerCard)+3);
-            firstCard = playerCard;
-            play = true;
-        }else{
-            if(numPickedUp<5){
-            pHand = pHand + getCard();
-            numPickedUp++;
-            }else{
-               play = true;
-            }
-         }
-         System.out.print("The top card of the deck is "+firstCard);
-         } 
-         String c1Card  = computerPlay(c1Hand, firstCard);
-         if(c1Card.indexOf("-drawagain")>=0){
-            c1Card = c1Card.substring(0,c1Card.indexOf("-drawagain"));
-            int c1numPickedUp = 0;
-            boolean computerPlay = false;
-            while(!computerPlay){
-               if(c1numPickedUp<5){
-                  c1numPickedUp++;
-                  c1Hand += getCard();
-                  c1Card = computerPlay(c1Hand, firstCard);
-                  if(c1Card.indexOf("-drawagain")>=0){
-                     computerPlay=false;
-                     c1Card = c1Card.substring(0,c1Card.indexOf("-drawagain")); 
-                  }else{
-                     computerPlay = true;
-                  }
-               }else{
-                  c1Card = c1Card.substring(0,c1Card.indexOf("-drawagain"));
-                  computerPlay = true;
-               }
-         }
-         }
-         if(c1Card.length()>4){
-            c1Hand = c1Card;
-            c1Card = firstCard;
-            System.out.println("Computer 1 cannot play.");
-         }else{
-            firstCard = c1Card;
-            System.out.println("Computer 1 plays: "+firstCard);
-         }
+         String p1breakdown = playerPlay(pHand, in, firstCard);
+         pHand = p1breakdown.substring(0, p1breakdown.indexOf("-"));
+         firstCard = p1breakdown.substring(p1breakdown.indexOf("-")+1);
+        
+         firstCard = ifTen(firstCard);
+         System.out.println("You play "+firstCard);
+         firstCard = reverseTen(firstCard);
 
-         String c2Card  = computerPlay(c2Hand, firstCard);
-         if(c2Card.indexOf("-drawagain")>=0){
-            c2Card = c2Card.substring(0,c2Card.indexOf("-drawagain"));
-            int c2numPickedUp = 0;
-            boolean computerPlay = false;
-            while(!computerPlay){
-               if(c2numPickedUp<5){
-                  c2numPickedUp++;
-                  c2Hand += getCard();
-                  c2Card = computerPlay(c2Hand, firstCard);
-                  if(c2Card.indexOf("-drawagain")>=0){
-                     computerPlay=false;
-                     c2Card = c2Card.substring(0,c2Card.indexOf("-drawagain")); 
-                  }else{
-                     computerPlay = true;
-                  }
-               }else{
-                  c2Card = c2Card.substring(0,c2Card.indexOf("-drawagain"));
-                  computerPlay = true;
-               }
-         }
-         }
-         if(c2Card.length()>3){
-            c2Hand = c2Card;
-            c2Card = firstCard;
-            System.out.println("Computer 2 cannot play");
-         }else{
-            firstCard = c2Card;
-            System.out.println("Computer 2 plays: "+firstCard);
-         }
+         pHand = ifTen(pHand);
+         System.out.println("Your Hand: "+pHand);
+         pHand = reverseTen(pHand);
          
+         String c1Breakdown = computerPlay(c1Hand, firstCard, 1);
+         c1Hand = c1Breakdown.substring(0, c1Breakdown.indexOf("-"));
+         firstCard = c1Breakdown.substring(c1Breakdown.indexOf("-")+1);
+
+         c1Hand = ifTen(c1Hand);
+         System.out.println("Computer Player 1's Hand: "+c1Hand);
+         c1Hand = reverseTen(c1Hand);
+
+         String c2Breakdown = computerPlay(c2Hand, firstCard, 2);
+         c2Hand = c2Breakdown.substring(0, c2Breakdown.indexOf("-"));
+         firstCard = c2Breakdown.substring(c2Breakdown.indexOf("-")+1);
+
+         c2Hand = ifTen(c2Hand);
+         System.out.println("Computer Player 2's Hand: "+c2Hand);
+         c2Hand = reverseTen(c2Hand);
+
+         System.out.print("Round Over");
+  
     }
 
-    private static String computerPlay(String hand, String firstCard) {
+    private static String computerPlay(String hand, String firstCard, int cNum) {
+      String card  = computerMove(hand, firstCard);
+      if(card.indexOf("-drawagain")>=0){
+         card = card.substring(0,card.indexOf("-drawagain"));
+         int c1numPickedUp = 0;
+         boolean computerPlay = false;
+         while(!computerPlay){
+            if(c1numPickedUp<5){
+               c1numPickedUp++;
+               hand += getCard();
+               card = computerMove(hand, firstCard);
+               if(card.indexOf("-drawagain")>=0){
+                  computerPlay=false;
+                  card = card.substring(0,card.indexOf("-drawagain")); 
+               }else{
+                  computerPlay = true;
+               }
+            }else{
+               card = card.substring(0,card.indexOf("-drawagain"));
+               computerPlay = true;
+            }
+      }
+      }
+      if(card.length()>4){
+         hand = card;
+         card = firstCard;
+         System.out.println("Computer "+cNum+" cannot play. Next player goes.");
+      }else{
+         firstCard = card;
+         hand = hand.substring(0, hand.indexOf(card))+hand.substring(hand.indexOf(card)+card.length()+1);
+         System.out.println("Computer "+cNum+" plays: "+firstCard);
+      }
+      return hand+"-"+firstCard;
+   }
+
+   private static String reverseTen(String str) {
+      String answer = "";
+      if(str.indexOf("10")>=0){
+         for(int i = 0; i<str.length(); i++){
+            if(str.substring(i,i+1).equals("1")){
+               answer = answer + "T";
+            }else if(str.substring(i,i+1).equals("0")){
+               
+            }else{
+               answer = answer + str.substring(i,i+1);
+            }
+         }
+      }else{
+         answer = str;
+      }
+      return answer;
+   }
+
+   private static String ifTen(String str) {
+      String answer = "";
+      if(str.indexOf("T")>=0){
+         for(int i = 0; i<str.length(); i++){
+            if(str.substring(i,i+1).equals("T")){
+               answer = answer + "10";
+            }else{
+               answer = answer + str.substring(i,i+1);
+            }
+         }
+      }else{
+         answer = str;
+      }
+      return answer;
+   }
+
+   private static String playerPlay(String pHand, Scanner in, String firstCard) {
+      boolean play = false;
+      int numPickedUp = 0;
+      while(!play){
+      if(canPlay(pHand, firstCard)){
+          String playerCard = playerMove(in, pHand, firstCard);
+          pHand = pHand.substring(0,pHand.indexOf(playerCard)) + pHand.substring(pHand.indexOf(playerCard)+3);
+          firstCard = playerCard;
+          play = true;
+      }else{
+          if(numPickedUp<5){
+          pHand = pHand + getCard();
+          numPickedUp++;
+          }else{
+             play = true;
+             System.out.println("You cannot play. Play passes to computer player 1");
+          }
+       }
+      }
+      return pHand+"-"+firstCard;
+}
+
+   private static String computerMove(String hand, String firstCard) {
       boolean play = false;
       String answer = "";
       while(!play){
-         for(int i = 0; i<hand.length(); i++){
-            if(hand.substring(i, i+1).equals(firstCard.substring(firstCard.length()-1))&&!(hand.substring(i-1,i).equals("8"))){
-               if(hand.substring(i-2,i).equals("10")){
-                  answer=hand.substring(i-2, i+1);
-               }else{
-                  answer = hand.substring(i, i+1);
-               }
+         for(int i = 0; i<hand.length()-1; i++){
+            if(hand.substring(i+1, i+2).equals(firstCard.substring(firstCard.length()-1))&&!(hand.substring(i,i+1).equals("8"))){
+               answer = hand.substring(i, i+2);
                play = true;
                i=hand.length();
             }
          }
          if(!play){
             for(int i = 0; i<hand.length(); i++){
-               if(hand.substring(i, i+1).equals(firstCard.substring(0,1))&&!(hand.substring(i+1,i+2).equals("8"))){
-                  if(hand.substring(i, i+2).equals("10")){
-                     answer=hand.substring(i, i+3);
-                  }else{
-                     answer = hand.substring(i, i+2);
-                  }
+               if(hand.substring(i, i+1).equals(firstCard.substring(0,1))&&!(hand.substring(i,i+1).equals("8"))){
+                  answer = hand.substring(i, i+2);
                   play = true;
                   i=hand.length();;
                }
@@ -161,9 +202,9 @@ public class CrazyEights {
          if(!play){
             for(int i = 0; i<hand.length(); i++){
                if(hand.substring(i, i+1).equals("8")){
-                  answer = WILD+getSuit();
+                  answer = "8"+getSuit();
                   play = true;
-                  i=hand.length();;
+                  i=hand.length();
                }
             }
          }
@@ -181,7 +222,7 @@ public class CrazyEights {
             return true;
          }else if(hand.substring(i, i+1).equals(card.substring(0,1))){
             return true;
-         }else if(hand.substring(i, i+1).equals(card.substring(1,2))||((hand.substring(i,i+2).equals("10"))&&(hand.substring(i+2,i+3).equals(card.substring(2,3))))){
+         }else if(hand.substring(i, i+1).equals(card.substring(1,2))){
             return true;
          }
       }
@@ -194,6 +235,7 @@ public class CrazyEights {
       while(!play){
       System.out.print("Please enter a card to play: ");
       answer = in.nextLine().toUpperCase();
+      answer = reverseTen(answer);
       if(hand.indexOf(answer)<0){
          System.out.println();
          System.out.println("Not a valid answer.");
@@ -205,7 +247,7 @@ public class CrazyEights {
                play = true;
             }else if(hand.substring(i, i+1).equals(answer.substring(answer.length()-1))&&firstCard.substring(answer.length()-1).equals(answer.substring(answer.length()-1))){
                play = true;
-            }//check if this works for tens
+            }
             
          }
          if(!play){
@@ -236,16 +278,19 @@ public class CrazyEights {
   
      private static String getFace() {
         int face = (int) (Math.random() * 13) + 1;
-        if (face > 1 && face < 11)
+        if (face > 1 && face < 10)
            return "" + face;
-        else if (face == 1)
+        else if(face == 10){
+           return TEN;
+        }else if (face == 1){
            return ACE;
-        else if (face == 11)
+        }else if (face == 11){
            return JACK;
-        else if (face == 12)
+        }else if (face == 12){
            return QUEEN;
-        else
+        }else{
            return KING;
+        }
      }
 
       /* if(card.substring(0,1).equals("A")){
