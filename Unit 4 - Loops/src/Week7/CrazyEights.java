@@ -18,69 +18,110 @@ public class CrazyEights {
     private static final int MAX_CARDS = 5;
 
     public static void main(String[] args) {
-        int pPoints = 0;
-        int c1Points = 0;
-        int c2Points = 0;
-
-        String pHand = "";
-        String c1Hand = "";
-        String c2Hand = "";
-
-        boolean gameOver = false;
-        boolean roundDone = false;
-
-        String round = "";
-
-        System.out.println("Welcome to Crazy Eights!");
-        System.out.println();
-
-        for(int i = 0; i<MAX_CARDS; i++){
-            pHand = getCard() + " " + pHand;
-            c1Hand = getCard() + " " + c1Hand;
-            c2Hand = getCard() + " " + c2Hand;
-        }
-
-        String firstCard = getCard();
-        while(firstCard.substring(0,1).equals("8")){
-            firstCard = getCard();
-        }
-
-        Scanner in = new Scanner(System.in);
-
-        while(!gameOver){
-           roundDone = false;
-           while(!roundDone){
-            round = round(pHand, c1Hand, c2Hand, firstCard, in);
-            pHand = round.substring(0, round.indexOf("-"));
-            c1Hand = round.substring(round.indexOf("-")+1, round.indexOf("*"));
-            c2Hand = round.substring(round.indexOf("*")+1, round.indexOf("_"));
-            firstCard = round.substring(round.indexOf("_"+1));
-            roundDone = roundOver(pHand, c1Hand, c2Hand);
-            }
-            pPoints = getPoints(pHand);
-            c1Points = getPoints(c1Hand);
-            c2Points = getPoints(c2Hand);
-            System.out.print("Player has "+pPoints+"points");
-            System.out.print("Computer player 1 has "+c1Points+"points");
-            System.out.print("Computer player 2 has "+c2Points+"points");
-            gameOver = gameDone(pPoints, c1Points, c2Points);
-         }
-         winner(pPoints, c1Points, c2Points);
+      System.out.println("Welcome to Crazy Eights!");
+      Scanner in = new Scanner(System.in);
+      boolean playNow = true;
+      while(playNow){
+         playNow = play(in);
+      }
     }
 
+    private static boolean playAgain(Scanner in) {
+      boolean validInput = false;
 
-    private static void winner(int pPoints, int c1Points, int c2Points) {
+      while (!validInput) {
+         System.out.println("Do you want to play again ([Y]es / [N]o)");
+         String answer = in.nextLine().toUpperCase();
+         if (answer.equals("YES") || answer.equals("Y")){
+            return true;
+         }else if (answer.equals("NO") || answer.equals("N")) {
+            return false;
+         }else {
+            System.out.println("Invalid Input: Yes or No only!");
+         }
+      }
+
+      return false;
+   }
+
+    private static boolean play(Scanner in) {
+      int pPoints = 0;
+      int c1Points = 0;
+      int c2Points = 0;
+
+      String pHand = "";
+      String c1Hand = "";
+      String c2Hand = "";
+
+      boolean gameOver = false;
+      boolean roundDone = false;
+
+      String round = "";
+
+      System.out.println();
+
+      String firstCard = getCard();
+      while(firstCard.substring(0,1).equals("8")){
+          firstCard = getCard();
+      }
+
+      while(!gameOver){
+         roundDone = false;
+         String deal = deal(pHand, c1Hand, c2Hand);
+         pHand = deal.substring(0, deal.indexOf("-"));
+         c1Hand = deal.substring(deal.indexOf("-")+1, deal.indexOf("*"));
+         c2Hand = deal.substring(deal.indexOf("*")+1);
+         while(!roundDone){
+          round = round(pHand, c1Hand, c2Hand, firstCard, in);
+          pHand = round.substring(0, round.indexOf("-"));
+          c1Hand = round.substring(round.indexOf("-")+1, round.indexOf("*"));
+          c2Hand = round.substring(round.indexOf("*")+1, round.indexOf("_"));
+          firstCard = round.substring(round.indexOf("_")+1);
+          roundDone = roundOver(pHand, c1Hand, c2Hand);
+          }
+          pPoints = getPoints(pHand);
+          c1Points = getPoints(c1Hand);
+          c2Points = getPoints(c2Hand);
+          System.out.print("Player has "+pPoints+"points");
+          System.out.print("Computer player 1 has "+c1Points+"points");
+          System.out.print("Computer player 2 has "+c2Points+"points");
+          gameOver = gameDone(pPoints, c1Points, c2Points);
+       }
+       winner(pPoints, c1Points, c2Points);
+       boolean again = playAgain(in);
+       if(again){
+          return true;
+       }else{
+          return false;
+       }
+   }
+
+   private static String deal(String pHand, String c1Hand, String c2Hand) {
+      for(int i = 0; i<MAX_CARDS; i++){
+         pHand = getCard() + " " + pHand;
+         c1Hand = getCard() + " " + c1Hand;
+         c2Hand = getCard() + " " + c2Hand;
+     }
+     return pHand +"-"+ c1Hand +"*"+ c2Hand;
+   }
+
+
+   private static void winner(int pPoints, int c1Points, int c2Points) {
       System.out.print("Player has "+pPoints+"points");
       System.out.print("Computer player 1 has "+c1Points+"points");
       System.out.print("Computer player 2 has "+c2Points+"points");
-      if(!(pPoints==100)&& pPoints<c1Points && pPoints<c2Points){
+      if(pPoints<c1Points && pPoints<c2Points){
          System.out.print("You won!!!!");
-      }else if(!(c1Points==100)&& c1Points<pPoints && c1Points<c2Points){
+      }else if(c1Points<pPoints && c1Points<c2Points){
          System.out.print("Computer Player 1 won!!!!");
-      }else if(!(c2Points==100)&& c2Points<pPoints && c2Points<c1Points){
+      }else if(c2Points<pPoints && c2Points<c1Points){
          System.out.print("Computer Player 2 won!!!!");
-      }else if((pPoints==c1Points && pPoints<100) || (c1Points==c2Points && c1Points<100) || (pPoints==c2Points && pPoints<100)){
-         System.out.print("Tie!!");
+      }else if(pPoints==c1Points && pPoints<c2Points){
+         System.out.print("Tie between Player and Computer Player 1!");
+      }else if(c1Points==c2Points && c1Points<pPoints){
+         System.out.print("Tie between Computer Player 1 and Computer Player 2!");
+      }else if(pPoints==c2Points && pPoints<c1Points){
+         System.out.print("Tie between Player and Computer Player 2!");
       }
    }
 
@@ -113,8 +154,10 @@ public class CrazyEights {
 
    private static boolean roundOver(String pHand, String c1Hand, String c2Hand) {
        if((pHand=="")||(c1Hand=="")||(c2Hand=="")){
+          System.out.println("-----------------------------------------------");
           return true;
        }else{
+            System.out.println("-----------------------------------------------");
           return false;
        }
    }
@@ -157,7 +200,6 @@ public class CrazyEights {
        System.out.println("Computer Player 2's Hand: "+ifTen(c2Hand));
        System.out.println();
 
-       System.out.println("Round Over");
        return pHand +"-"+ c1Hand +"*"+ c2Hand +"_"+ firstCard;
    }
 
