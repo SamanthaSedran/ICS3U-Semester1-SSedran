@@ -215,8 +215,8 @@ public class CrazyEights {
 
    private static String round(String pHand, String c1Hand, String c2Hand, String firstCard, Scanner in) {
       System.out.println("Your Hand: "+ifTen(pHand));
-      System.out.println("Computer Player 1's Hand: "+ifTen(c1Hand));
-      System.out.println("Computer Player 2's Hand: "+ifTen(c2Hand));
+      System.out.println("Computer Player 1's Hand: "+makex(c1Hand));
+      System.out.println("Computer Player 2's Hand: "+makex(c2Hand));
       System.out.println();
 
       System.out.println("The face up card is: "+ifTen(firstCard));
@@ -240,19 +240,31 @@ public class CrazyEights {
        c1Hand = c1Breakdown.substring(0, c1Breakdown.indexOf("-"));
        firstCard = c1Breakdown.substring(c1Breakdown.indexOf("-")+1);
 
-       System.out.println("Computer Player 1's Hand: "+ifTen(c1Hand));
+       System.out.println("Computer Player 1's Hand: "+makex(c1Hand));
        System.out.println();
 
        String c2Breakdown = computerPlay(c2Hand, firstCard, 2);
        c2Hand = c2Breakdown.substring(0, c2Breakdown.indexOf("-"));
        firstCard = c2Breakdown.substring(c2Breakdown.indexOf("-")+1);
 
-       System.out.println("Computer Player 2's Hand: "+ifTen(c2Hand));
+       System.out.println("Computer Player 2's Hand: "+makex(c2Hand));
        System.out.println();
 
        return pHand +"-"+ c1Hand +"*"+ c2Hand +"_"+ firstCard;
    }
 
+   /**
+    * Replaces each card in computer player's hand to "XX " so player cannot see the hand
+    * @param c1Hand - computer player's hand
+    * @return - the hand written in X's Ex. "XX XX XX XX"
+    */
+   private static String makex(String c1Hand) {
+      String xhand = "";
+      for(int i = 0; i<c1Hand.length(); i+=3){
+         xhand = "XX "+xhand;
+      }
+      return xhand;
+   }
    /**
     * This method first checks if the card the player wants to play is an 8.
     * If the player plays an eight, this method asks it what suit they want to play.
@@ -302,7 +314,7 @@ public class CrazyEights {
             if(c1numPickedUp<5){
                c1numPickedUp++;
                String compickup = getCard();
-               System.out.println("Computer "+cNum+" cannot play with the cards it has. So it picks up: "+ifTen(compickup));
+               System.out.println("Computer "+cNum+" cannot play with the cards it has. So it picks up: "+makex(compickup));
                hand += compickup + " ";
                card = computerMove(hand, firstCard);
                if(card.indexOf("-drawagain")>=0){
