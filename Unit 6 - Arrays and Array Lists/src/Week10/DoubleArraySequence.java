@@ -29,6 +29,7 @@ public class DoubleArraySequence {
    // stored in any of data; for a non-empty sequence, the elements of the
    // sequence are stored in data[0] through data[manyItems-1], and we
    // don't care what's in the rest of data.
+   // Sequence, part of an array that you are using
    // 3. If there is a current element, then it lies in data[currentIndex];
    // if there is no current element, then currentIndex equals manyItems.
    private double[] data;
@@ -46,6 +47,23 @@ public class DoubleArraySequence {
     *                             double[10].
     **/
    // Created DoubleArraySequence
+   /*public static void main(String[] args) {
+      int score = 0;
+      DoubleArraySequence d1 = new DoubleArraySequence();
+      DoubleArraySequence d2 = new DoubleArraySequence(5);
+      DoubleArraySequence d3 = new DoubleArraySequence(d2);
+
+      if (d1.size() == 0)
+         score++;
+
+      
+
+      d2.addAfter(1.0);
+      
+      d2.addAfter(2.0);
+      d2.addAfter(3.0);
+      d2.addAfter(4.0);
+   }*/
    public DoubleArraySequence() {
       manyItems = 0;
       currentIndex = 0;
@@ -86,6 +104,10 @@ public class DoubleArraySequence {
    public DoubleArraySequence(DoubleArraySequence src) {
       this.manyItems = src.manyItems;
       this.currentIndex = src.currentIndex;
+      data = new double[src.getCapacity()];
+      for(int i=0; i<src.getCapacity(); i++){
+         data[i] = src.data[i];
+      }
 
       // copy src.data into this.data
    }
@@ -107,7 +129,40 @@ public class DoubleArraySequence {
     * @note An attempt to increase the capacity beyond Integer.MAX_VALUE will cause
     *       the sequence to fail with an arithmetic overflow.
     **/
-   public void addAfter(double d) {
+   public void addAfter(double d){
+      if(this.isCurrent()&&this.manyItems<this.data.length){
+         for(int i = manyItems; i>currentIndex; i--){
+            this.data[i]=this.data[i-1];
+         }
+         this.data[currentIndex+1]=d;
+         
+         this.manyItems++;
+         this.currentIndex++;
+      }else if(this.isCurrent()&&this.manyItems>=this.data.length){
+         DoubleArraySequence arr = new DoubleArraySequence(this.manyItems*2);
+         for(int i = this.manyItems; i>this.currentIndex; i--){
+            arr.data[i]=this.data[i-1];
+         }
+         arr.data[this.currentIndex+1]=d;
+         for(int i = this.currentIndex; i>=0; i--){
+            arr.data[i]=this.data[i];
+         }
+         this.currentIndex++;
+         this.manyItems++;
+         this.data = arr.data;
+      }else if(!this.isCurrent()&&this.manyItems<this.data.length){
+         this.data[this.manyItems] = d;
+         this.currentIndex = this.manyItems;
+         this.manyItems++;
+      }else if(!this.isCurrent()&&this.manyItems>=this.data.length){
+         DoubleArraySequence arr = new DoubleArraySequence(this.manyItems*2);
+         for(int i=0; i<this.manyItems; i++){
+            arr.data[i] = this.data[i];
+         }
+         arr.data[this.manyItems] = d;
+         this.currentIndex = this.manyItems;
+         this.data = arr.data;
+      }
 
    }
 
@@ -129,7 +184,41 @@ public class DoubleArraySequence {
     *       the sequence to fail with an arithmetic overflow.
     **/
    public void addBefore(double element) {
-
+      if(this.isCurrent()&&this.manyItems<this.data.length){
+         for(int i = this.manyItems; i>this.currentIndex; i--){
+            this.data[i]=this.data[i-1];
+         }
+         this.data[currentIndex]=element;
+         this.manyItems++;
+      }else if(this.isCurrent()&&this.manyItems>=this.data.length){
+         DoubleArraySequence arr = new DoubleArraySequence(this.manyItems*2);
+         for(int i = this.manyItems; i>this.currentIndex; i--){
+            arr.data[i]=this.data[i-1];
+         }
+         arr.data[currentIndex]=element;
+         if(this.currentIndex>0){
+            for(int i = this.currentIndex-1; i>=0; i--){
+               arr.data[i]=this.data[i];
+            }
+         }
+         this.manyItems++;
+         this.data = arr.data;
+      }else if(!this.isCurrent()&&this.manyItems<this.data.length){
+         for(int i = this.manyItems; i>0; i--){
+            this.data[i]=this.data[i-1];
+         }
+         this.data[0]=element;
+         this.currentIndex=0;
+         this.manyItems++;
+      }else if(!this.isCurrent()&&this.manyItems>=this.data.length){
+         DoubleArraySequence arr = new DoubleArraySequence(this.manyItems*2);
+         for(int i = this.manyItems; i>0; i--){
+            arr.data[i]=this.data[i-1];
+         }
+         this.manyItems++;
+         this.data[0]=element;
+         this.data = arr.data;
+      }
    }
 
    /**
@@ -148,7 +237,42 @@ public class DoubleArraySequence {
     *       an arithmetic overflow that will cause the sequence to fail.
     **/
    public void addAll(DoubleArraySequence addend) {
-
+      if(addend==null){
+         throw new NullPointerException("addend cannot be null.");
+      }else{
+         if(this.getCapacity()>this.manyItems+addend.manyItems){
+            DoubleArraySequence arr = new DoubleArraySequence(this.getCapacity());
+            for(int i=0; i<this.manyItems; i++){
+               arr.data[i] = this.data[i];
+            }
+            for(int i=this.manyItems; i<addend.manyItems+this.manyItems; i++){
+               arr.data[i] = addend.data[i-this.manyItems];
+            }
+            this.manyItems+=addend.manyItems;
+            this.data = arr.data;
+         }else{
+            DoubleArraySequence arr = new DoubleArraySequence(this.manyItems+addend.manyItems);
+            for(int i=0; i<this.manyItems; i++){
+               arr.data[i] = this.data[i];
+            }
+            for(int i=this.manyItems; i<addend.manyItems+this.manyItems; i++){
+               arr.data[i] = addend.data[i-this.manyItems];
+            }
+            this.manyItems+=addend.manyItems;
+            this.data = arr.data;
+         }
+      }
+      
+      /*else{
+         DoubleArraySequence arr = new DoubleArraySequence(this.manyItems+addend.manyItems);
+         for(int i=0; i<this.manyItems; i++){
+            arr.data[i] = this.data[i];
+         }
+         for(int j=0; j<addend.manyItems; j++){
+            arr.data[j+this.manyItems] = addend.data[j];
+         }
+         this.data = arr.data;
+      }  */
    }
 
    /**
@@ -188,7 +312,15 @@ public class DoubleArraySequence {
     *       sequence to fail.
     **/
    public static DoubleArraySequence catenation(DoubleArraySequence s1, DoubleArraySequence s2) {
-      return null;
+      if(s1==null||s2==null){
+         throw new NullPointerException("s1 and s2 cannot be null.");
+      }else{
+         DoubleArraySequence arr = new DoubleArraySequence(s1);
+         arr.addAll(s2);
+         arr.trimToSize();
+         arr.currentIndex = arr.manyItems;
+         return arr;
+      }
 
    }
 
@@ -203,6 +335,13 @@ public class DoubleArraySequence {
     *                             int[minimumCapacity].
     **/
    public void ensureCapacity(int minimumCapacity) {
+      if(this.getCapacity()<minimumCapacity){
+         DoubleArraySequence arr = new DoubleArraySequence(minimumCapacity);
+         for(int i=0; i<this.manyItems; i++){
+            arr.data[i]=this.data[i];
+         }
+         this.data = arr.data;
+      }
 
    }
 
@@ -259,7 +398,20 @@ public class DoubleArraySequence {
     *                                  so removeCurrent may not be called.
     **/
    public void removeCurrent() {
-
+      if (!isCurrent()){
+         throw new IllegalStateException("No Current Element!");
+      }else{
+         if(currentIndex==manyItems-1){
+            data[currentIndex]=0.0;
+            currentIndex=0;
+            manyItems--;
+         }else{
+            for(int i=currentIndex; i<manyItems; i++){
+               data[i]=data[i+1];
+            }
+            manyItems--;
+         }
+      }
    }
 
    /**
@@ -295,7 +447,11 @@ public class DoubleArraySequence {
     *                             capacity.
     **/
    public void trimToSize() {
-
+      DoubleArraySequence arr = new DoubleArraySequence(this.manyItems);
+      for(int i=0; i<arr.getCapacity(); i++){
+         arr.data[i]=this.data[i];
+      }
+      this.data=arr.data;
    }
 
    public int getCurrentIndex() {
